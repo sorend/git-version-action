@@ -21,7 +21,7 @@ jobs:
           fetch-depth: 0
 
       - id: git-version
-        uses: your-org/git-version-action@v1
+        uses: sorend/git-version-action@v1
 
       - run: echo "version is ${{ steps.git-version.outputs.version }}"
 ```
