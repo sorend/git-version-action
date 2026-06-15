@@ -121,25 +121,37 @@ func findLatestTagAndCount(repo *git.Repository, headHash plumbing.Hash) (*semve
 		return nil, 0, err
 	}
 
-	commit, err := repo.CommitObject(headHash)
-	if err != nil {
-		return nil, 0, err
+	type entry struct {
+		hash  plumbing.Hash
+		depth int
 	}
 
-	commitsSince := 0
-	for {
-		if v, ok := tagByCommit[commit.Hash]; ok {
-			return v, commitsSince, nil
+	visited := make(map[plumbing.Hash]bool)
+	queue := []entry{{headHash, 0}}
+
+	for len(queue) > 0 {
+		e := queue[0]
+		queue = queue[1:]
+
+		if visited[e.hash] {
+			continue
 		}
-		parents := commit.ParentHashes
-		if len(parents) == 0 {
-			break
+		visited[e.hash] = true
+
+		if v, ok := tagByCommit[e.hash]; ok {
+			return v, e.depth, nil
 		}
-		commit, err = repo.CommitObject(parents[0])
+
+		commit, err := repo.CommitObject(e.hash)
 		if err != nil {
-			return nil, 0, err
+			continue
 		}
-		commitsSince++
+
+		for _, parent := range commit.ParentHashes {
+			if !visited[parent] {
+				queue = append(queue, entry{parent, e.depth + 1})
+			}
+		}
 	}
 
 	return nil, 0, fmt.Errorf("no semver tag found in history")
@@ -171,6 +183,10 @@ func getBranchName(repo *git.Repository, head *plumbing.Reference) (string, erro
 		return match, nil
 	}
 
+	// For pull_request events, GITHUB_HEAD_REF holds the source branch name.
+	if ref := os.Getenv("GITHUB_HEAD_REF"); ref != "" {
+		return ref, nil
+	}
 	if ref := os.Getenv("GITHUB_REF_NAME"); ref != "" {
 		return ref, nil
 	}

@@ -11,4 +11,4 @@ outputs:
     description: 'The computed version string (e.g. v2.0.0.b1a2b+3)'
 runs:
   using: 'docker'
-  image: 'docker://ghcr.io/sorend/git-version-action:1.0.0'
+  image: 'docker://ghcr.io/sorend/git-version-action:1.0.1'
