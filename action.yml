@@ -1,0 +1,14 @@
+name: 'Git Version'
+description: >
+  Calculate a semver tag version based on the nearest existing semver tag,
+  current branch, and commit distance. Designed for use in CI/CD release
+  workflows built on GitHub Actions.
+branding:
+  icon: 'tag'
+  color: 'gray-dark'
+outputs:
+  version:
+    description: 'The computed version string (e.g. v2.0.0.b1a2b+3)'
+runs:
+  using: 'docker'
+  image: 'docker://ghcr.io/sorend/git-version-action:v1.0.0'

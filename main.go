@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	relReleasePattern = regexp.MustCompile(`^(rel|release)/`)
+	relReleasePattern  = regexp.MustCompile(`^(rel|release)/`)
 	featFeaturePattern = regexp.MustCompile(`^(feat|feature)/`)
 )
 
