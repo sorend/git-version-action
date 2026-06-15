@@ -45,7 +45,8 @@ func main() {
 		fatal("error determining branch: %v", err)
 	}
 
-	nextVersion := calculateNextVersion(latestTag, branchName, calculateBranchID(branchName), commitsSince)
+	mainBranch := getMainBranch()
+	nextVersion := calculateNextVersion(latestTag, branchName, calculateBranchID(branchName), mainBranch, commitsSince)
 	fmt.Println(nextVersion)
 }
 
@@ -200,13 +201,20 @@ func getBranchName(repo *git.Repository, head *plumbing.Reference) (string, erro
 	return "", fmt.Errorf("could not determine branch name")
 }
 
+func getMainBranch() string {
+	if v := os.Getenv("INPUT_MAIN_BRANCH"); v != "" {
+		return v
+	}
+	return "main"
+}
+
 func calculateBranchID(branchName string) string {
 	h := sha256.Sum256([]byte(branchName))
 	id := (uint64(h[0]) | uint64(h[1])<<8 | uint64(h[2])<<16 | uint64(h[3])<<24) % 10000
 	return fmt.Sprintf("b%04d", id)
 }
 
-func calculateNextVersion(latestTag *semver.Version, branchName, branchID string, commitsSince int) string {
+func calculateNextVersion(latestTag *semver.Version, branchName, branchID, mainBranch string, commitsSince int) string {
 	var major, minor, patch uint64
 
 	switch {
@@ -224,9 +232,9 @@ func calculateNextVersion(latestTag *semver.Version, branchName, branchID string
 		patch = latestTag.Patch() + 1
 	}
 
-	if branchName == "main" || branchName == "master" {
-		return fmt.Sprintf("v%d.%d.%d+%d", major, minor, patch, commitsSince)
+	if branchName == mainBranch {
+		return fmt.Sprintf("v%d.%d.%d-rc.%d", major, minor, patch, commitsSince)
 	}
 
-	return fmt.Sprintf("v%d.%d.%d.%s+%d", major, minor, patch, branchID, commitsSince)
+	return fmt.Sprintf("v%d.%d.%d-rc.%d-%s", major, minor, patch, commitsSince, branchID)
 }

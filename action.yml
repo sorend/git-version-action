@@ -6,9 +6,14 @@ description: >
 branding:
   icon: 'tag'
   color: 'gray-dark'
+inputs:
+  main_branch:
+    description: 'Name of the main branch; omits the branch-id suffix from the version on this branch'
+    required: false
+    default: 'main'
 outputs:
   version:
-    description: 'The computed version string (e.g. v2.0.0.b1a2b+3)'
+    description: 'The computed version string (e.g. v2.0.0-rc.3-b1234)'
 runs:
   using: 'docker'
-  image: 'docker://ghcr.io/sorend/git-version-action:1.0.1'
+  image: 'docker://ghcr.io/sorend/git-version-action:1.0.2'
