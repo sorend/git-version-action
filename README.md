@@ -5,9 +5,9 @@ nearest existing semver tag, current branch, and commit distance.
 
 ## Outputs
 
-| Name      | Description                                   |
-|-----------|-----------------------------------------------|
-| `version` | Computed version string (e.g. `v2.0.0+3`) |
+| Name      | Description                                        |
+|-----------|----------------------------------------------------|
+| `version` | Computed version string (e.g. `v2.0.0-rc.3`) |
 
 ## Usage
 
@@ -44,18 +44,18 @@ That tag is returned as-is.
 | `feat/` or `feature/` | `v<major>.<minor+1>.0`                          |
 | *(anything else)*     | `v<major>.<minor>.<patch+1>`                    |
 
-3. Append the **branch-id** (a 4-digit hash of the branch name) and the
-   **commit count** since the tag:
+3. Append the **commit count** since the tag as a pre-release identifier and
+   the **branch-id** (a 4-digit hash of the branch name):
 
    ```
-   v<major>.<minor>.<patch>.<branch-id>+<commits>
+   v<major>.<minor>.<patch>-rc.<commits>-<branch-id>
    ```
 
-4. If the branch is `main` or `master` the `.<branch-id>` segment is
-   omitted:
+4. If the branch matches the configured `main_branch` input (default: `main`),
+   the `-<branch-id>` suffix is omitted:
 
    ```
-   v<major>.<minor>.<patch>+<commits>
+   v<major>.<minor>.<patch>-rc.<commits>
    ```
 
 ### Branch ID
@@ -70,15 +70,18 @@ For example: `feature/foo` → `b1432`.
 
 ## Branch naming reference
 
-| Branch name              | Nearest tag | Result                    |
-|--------------------------|-------------|---------------------------|
-| `main`                   | `v1.0.0`    | `v1.0.1+3`               |
-| `master`                 | `v1.0.0`    | `v1.0.1+3`               |
-| `feat/foo`               | `v1.0.0`    | `v1.1.0.b1432+3`         |
-| `feature/login`          | `v1.0.0`    | `v1.1.0.babcd+3`         |
-| `rel/v2`                 | `v1.0.0`    | `v2.0.0.b5678+3`         |
-| `release/v2`             | `v1.0.0`    | `v2.0.0.b9012+3`         |
-| `bugfix/issue-42`        | `v1.0.0`    | `v1.0.1.b6264+3`         |
+| Branch name              | Nearest tag | Result                        |
+|--------------------------|-------------|-------------------------------|
+| `main`                   | `v1.0.0`    | `v1.0.1-rc.3`                |
+| `master`                 | `v1.0.0`    | `v1.0.1-rc.3-b3471`          |
+| `feat/foo`               | `v1.0.0`    | `v1.1.0-rc.3-b1432`          |
+| `feature/login`          | `v1.0.0`    | `v1.1.0-rc.3-b7823`          |
+| `rel/v2`                 | `v1.0.0`    | `v2.0.0-rc.3-b5678`          |
+| `release/v2`             | `v1.0.0`    | `v2.0.0-rc.3-b9012`          |
+| `bugfix/issue-42`        | `v1.0.0`    | `v1.0.1-rc.3-b6264`          |
+
+> `master` gets a branch-id because the default `main_branch` is `main`.
+> Set `main_branch: master` in the action inputs to omit the suffix on that branch.
 
 ## Local testing
 
@@ -103,7 +106,7 @@ $ git commit --allow-empty -m "second commit"
 $ git checkout -b feat/awesome
 $ git commit --allow-empty -m "third commit"
 $ ~/git-version-action/git-version
-v1.1.0.b1432+2
+v1.1.0-rc.2-b1432
 ```
 
 ## Development
