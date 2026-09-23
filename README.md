@@ -23,7 +23,7 @@ jobs:
           fetch-tags: true
 
       - id: git-version
-        uses: sorend/git-version-action@v1
+        uses: sorend/git-version-action@v2
 
       - run: echo "version is ${{ steps.git-version.outputs.version }}"
       - run: echo "tagged is ${{ steps.git-version.outputs.tagged }}"
