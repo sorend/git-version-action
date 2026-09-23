@@ -18,4 +18,4 @@ outputs:
     description: 'Whether the current commit is tagged with a semver version'
 runs:
   using: 'docker'
-  image: 'docker://ghcr.io/sorend/git-version-action:1.0.2'
+  image: 'docker://ghcr.io/sorend/git-version-action:2.0.1'
