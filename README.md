@@ -5,9 +5,10 @@ nearest existing semver tag, current branch, and commit distance.
 
 ## Outputs
 
-| Name      | Description                                        |
-|-----------|----------------------------------------------------|
-| `version` | Computed version string (e.g. `v2.0.0-rc.3`) |
+| Name      | Description                                      |
+|-----------|--------------------------------------------------|
+| `version` | Computed version string (e.g. `v2.0.0-rc.3`)     |
+| `tagged`  | `true` if the current commit has a semver tag, otherwise `false` |
 
 ## Usage
 
@@ -25,6 +26,7 @@ jobs:
         uses: sorend/git-version-action@v1
 
       - run: echo "version is ${{ steps.git-version.outputs.version }}"
+      - run: echo "tagged is ${{ steps.git-version.outputs.tagged }}"
 ```
 
 ## Version logic
@@ -95,7 +97,7 @@ cd /path/to/your/repo
 ```
 
 The binary reads the repository from the current working directory and
-prints the computed version to stdout.
+prints the action outputs to stdout in `key=value` format.
 
 ### Example
 
@@ -106,7 +108,8 @@ $ git commit --allow-empty -m "second commit"
 $ git checkout -b feat/awesome
 $ git commit --allow-empty -m "third commit"
 $ ~/git-version-action/git-version
-v1.1.0-rc.2-b1432
+version=v1.1.0-rc.2-b1432
+tagged=false
 ```
 
 ## Development

@@ -30,24 +30,26 @@ func main() {
 		fatal("error getting HEAD: %v", err)
 	}
 
-	if tag := getHeadTag(repo, head.Hash()); tag != "" {
-		fmt.Println(tag)
-		return
+	tag := getHeadTag(repo, head.Hash())
+	var version string
+	if tag != "" {
+		version = tag
+	} else {
+		latestTag, commitsSince, err := findLatestTagAndCount(repo, head.Hash())
+		if err != nil {
+			fatal("no semver tag found in history: %v", err)
+		}
+
+		branchName, err := getBranchName(repo, head)
+		if err != nil {
+			fatal("error determining branch: %v", err)
+		}
+
+		mainBranch := getMainBranch()
+		version = calculateNextVersion(latestTag, branchName, calculateBranchID(branchName), mainBranch, commitsSince)
 	}
 
-	latestTag, commitsSince, err := findLatestTagAndCount(repo, head.Hash())
-	if err != nil {
-		fatal("no semver tag found in history: %v", err)
-	}
-
-	branchName, err := getBranchName(repo, head)
-	if err != nil {
-		fatal("error determining branch: %v", err)
-	}
-
-	mainBranch := getMainBranch()
-	nextVersion := calculateNextVersion(latestTag, branchName, calculateBranchID(branchName), mainBranch, commitsSince)
-	fmt.Println(nextVersion)
+	fmt.Printf("version=%s\ntagged=%t\n", version, tag != "")
 }
 
 func fatal(format string, args ...interface{}) {

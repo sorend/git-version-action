@@ -14,6 +14,8 @@ inputs:
 outputs:
   version:
     description: 'The computed version string (e.g. v2.0.0-rc.3-b1234)'
+  tagged:
+    description: 'Whether the current commit is tagged with a semver version'
 runs:
   using: 'docker'
   image: 'docker://ghcr.io/sorend/git-version-action:1.0.2'
